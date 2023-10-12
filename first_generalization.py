@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 from data import nodes, elements, nodes_restrictions, force_vector
 
 R = 0.01
@@ -247,16 +246,4 @@ def new_element_position(element_number):
     return [X, Y]
 
 
-for e in range(0, elements_number):
-    [initial_x_coordinate, initial_y_coordinate] = initial_element_position(e + 1)
-    [deformed_x_coordinate, deformed_y_coordinate] = new_element_position(e + 1)
-    if e == 0:
-        plt.plot(initial_x_coordinate, initial_y_coordinate, color="black", label="Не деформированное состояние")
-        plt.plot(deformed_x_coordinate, deformed_y_coordinate, color="green", label="Деформированное состояние")
-    else:
-        plt.plot(initial_x_coordinate, initial_y_coordinate, color="black")
-        plt.plot(deformed_x_coordinate, deformed_y_coordinate, color="green")
-plt.legend()
-plt.title("Расчет балочной коснтрукции")
 
-plt.show()

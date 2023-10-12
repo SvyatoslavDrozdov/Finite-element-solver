@@ -71,11 +71,11 @@ if third_setting:
         ["hard seal", None],
         ["movable hinge OY", None],
         ["movable hinge OX", None],
-        ["movable hinge Cx", -2],
-        ["free", None]
+        ["movable hinge Cx", 2],
+        ["movable hinge Cx", -2]
     ]
     F_x_2 = 0
-    F_y_2 = -20000000
+    F_y_2 = -500_000_0
     M_2 = 0
     F_x_3 = 0
     F_y_3 = 0
