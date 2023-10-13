@@ -1,5 +1,8 @@
 import matplotlib.pyplot as plt
 from first_generalization import *
+
+plt.figure(figsize=(8, 8))
+
 for e in range(0, elements_number):
     [initial_x_coordinate, initial_y_coordinate] = initial_element_position(e + 1)
     [deformed_x_coordinate, deformed_y_coordinate] = new_element_position(e + 1)
@@ -10,7 +13,7 @@ for e in range(0, elements_number):
         plt.plot(initial_x_coordinate, initial_y_coordinate, 'k--')
         plt.plot(deformed_x_coordinate, deformed_y_coordinate, color="blue")
 plt.legend()
-plt.title("Расчет балочной конструкции")
+# plt.title("Расчет балочной конструкции")
 
 Length_max = 0
 for e in range(0, elements_number):
@@ -31,7 +34,7 @@ for nodes_restriction in nodes_restrictions:
     if nodes_restriction[0] == "hard seal":
         [x_i, y_i] = nodes[node_num - 1]
         plt.plot(x_i, y_i, 'Dk')
-        plt.errorbar(x_i, y_i, xerr=0.1, yerr=0.1, color = "black")
+        plt.errorbar(x_i, y_i, xerr=0.1, yerr=0.1, color="black")
     if nodes_restriction[0] == "movable hinge OY":
         [x_i, y_i] = nodes[node_num - 1]
         plt.plot(x_i, y_i, 'or')
@@ -59,4 +62,14 @@ for nodes_restriction in nodes_restrictions:
 
     node_num += 1
 plt.axis('equal')
+plt.grid()
+plt.savefig('foo.png')
+
 plt.show()
+
+# plt.figure(figsize=(6, 6))
+# plt.axis('equal')
+
+# plt.grid()
+# plt.savefig('empty_foo.png')
+# plt.show()

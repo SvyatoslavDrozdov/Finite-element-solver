@@ -1,28 +1,30 @@
 import numpy as np
-from data import nodes, elements, nodes_restrictions, force_vector
+from data import nodes, elements, nodes_restrictions, force_vector, element_properties
 
-R = 0.01
-L = 1
-P = 100
 
-E = 2.1E11
-A = np.pi * R ** 2
-I = np.pi * R ** 4 / 4
+def local_stiffness_matrix_function(prop, e_num):
+    E = prop[0]
+    A = prop[1]
+    I = prop[2]
+    [first_node, second_node] = elements[e_num]
+    [x_i, y_i] = nodes[first_node - 1]
+    [x_j, y_j] = nodes[second_node - 1]
+    L = ((x_i - x_j) ** 2 + (y_i - y_j) ** 2) ** 0.5
+    EAL = E * A / L
+    EIL3 = 12 * E * I / L ** 3
+    EIL2 = 6 * E * I / L ** 2
+    EIL1_2 = 2 * E * I / L
+    EIL1_4 = 4 * E * I / L
+    stiffness_matrix = np.array([
+        [EAL, 0, 0, - EAL, 0, 0],
+        [0, EIL3, EIL2, 0, -EIL3, EIL2],
+        [0, EIL2, EIL1_4, 0, -EIL2, EIL1_2],
+        [-EAL, 0, 0, EAL, 0, 0],
+        [0, -EIL3, -EIL2, 0, EIL3, -EIL2],
+        [0, EIL2, EIL1_2, 0, -EIL2, EIL1_4]
+    ])
+    return stiffness_matrix
 
-EAL = E * A / L
-EIL3 = 12 * E * I / L ** 3
-EIL2 = 6 * E * I / L ** 2
-EIL1_2 = 2 * E * I / L
-EIL1_4 = 4 * E * I / L
-
-local_stiffness_matrix = np.array([
-    [EAL, 0, 0, - EAL, 0, 0],
-    [0, EIL3, EIL2, 0, -EIL3, EIL2],
-    [0, EIL2, EIL1_4, 0, -EIL2, EIL1_2],
-    [-EAL, 0, 0, EAL, 0, 0],
-    [0, -EIL3, -EIL2, 0, EIL3, -EIL2],
-    [0, EIL2, EIL1_2, 0, -EIL2, EIL1_4]
-])
 
 nodes_number = len(nodes)
 elements_number = len(elements)
@@ -45,9 +47,12 @@ def T(our_element):
 
 
 global_element_stiffness_matrix = []
+e = 0
 for element in elements:
+    local_stiffness_matrix = local_stiffness_matrix_function(element_properties[e], e)
     stiffness = np.dot(np.dot(T(element).transpose(), local_stiffness_matrix), T(element))
     global_element_stiffness_matrix.append(stiffness)
+    e += 1
 
 stiffness_diagonal_matrix = np.zeros((6 * elements_number, 6 * elements_number))
 for e in range(0, elements_number):
@@ -244,6 +249,3 @@ def new_element_position(element_number):
     X = X_0 + delta_X
     Y = Y_0 + delta_Y
     return [X, Y]
-
-
-

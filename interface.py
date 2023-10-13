@@ -1,0 +1,165 @@
+import tkinter
+import customtkinter as ctk
+from PIL import ImageTk, Image
+from sub_plot import plot_points_function
+
+# from sub_plot import plot_points_function
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
+
+app = ctk.CTk()
+app.geometry("1480x720")
+app.resizable(width=False, height=False)
+
+
+def button_function():
+    show_lines = show_lines_switch.get()
+    if show_lines:
+        plot_points_function(X, Y, BC, BC_parameter, line_points)
+    else:
+        plot_points_function(X, Y, BC, BC_parameter, [])
+    img = ctk.CTkImage(Image.open("foo.png"), size=(600, 600))
+    label = ctk.CTkLabel(master=frame, image=img, text="")
+    label.place(relx=0.7, rely=0.5, anchor=ctk.CENTER)
+
+
+frame = ctk.CTkFrame(master=app)
+frame.pack(pady=20, padx=60, fill="both", expand=True)
+
+empty_img = ctk.CTkImage(Image.open("empty_foo.png"), size=(600, 600))
+empty_label = ctk.CTkLabel(master=frame, image=empty_img, text="")
+empty_label.place(relx=0.7, rely=0.5, anchor=ctk.CENTER)
+
+button = ctk.CTkButton(master=frame, text="Обновить график", command=button_function)
+button.place(relx=0.1, rely=0.8, anchor=ctk.CENTER)
+
+# My settings: --------------------------------------------------------------------------------------------------------
+X1 = 30
+X2 = 250
+Y1 = 10
+Y2 = 60
+dY = 50
+dX = 25
+Y3 = Y2 + 6 * dY
+StandardWidth = 80
+StandardWidth2 = 120
+X3 = X2 + 2 * StandardWidth + 2 * dX
+X4 = X3 + 2 * StandardWidth + 2 * dX
+X5 = X4 + 2 * StandardWidth + 2 * dX
+
+# My functions: --------------------------------------------------------------------------------------------------------
+X = []
+Y = []
+point_num = []
+BC = []
+BC_parameter = []
+
+def test(condition, condition_parameter):
+    flag = 0
+    if condition == "":
+        flag = 1
+    if condition == "шарнир" and condition_parameter == "":
+        flag = 1
+    if condition == "шарнир" and condition_parameter == "OX":
+        flag = 1
+    if condition == "шарнир" and condition_parameter == "OY":
+        flag = 1
+    if condition == "шарнир" and type(condition_parameter) == float:
+        flag = 1
+    if condition == "заделка":
+        flag = 1
+    return flag
+def add_point_function():
+    global X
+    global Y
+    global point_num
+    global BC
+    global BC_parameter
+    x = float(entry_x_of_point.get())
+    y = float(entry_y_of_point.get())
+    boundary_condition = entry_boundary_condition.get()
+    try:
+        boundary_condition_parameter = float(entry_boundary_condition_parameter.get())
+    except:
+        boundary_condition_parameter = entry_boundary_condition_parameter.get()
+    if test(boundary_condition, boundary_condition_parameter) == 1:
+        X.append(x)
+        Y.append(y)
+        BC.append(boundary_condition)
+        BC_parameter.append(boundary_condition_parameter)
+        plot_points_function(X, Y, BC, BC_parameter, [])
+        button_function()
+
+
+line_points = []
+
+
+def add_line_function():
+    global line_points
+    num_of_point_1 = int(entry_num_of_point_1.get())
+    num_of_point_2 = int(entry_num_of_point_2.get())
+    line_points.append([num_of_point_1, num_of_point_2])
+    plot_points_function(X, Y, BC, BC_parameter, line_points)
+    button_function()
+
+
+# My windows: --------------------------------------------------------------------------------------------------------
+
+# Задание точек: -----------------------------------------------------------------------------------------------------
+ctk.CTkLabel(master=frame, text="Задание точек", text_color='white', fg_color="#7F55F2", width=6 * StandardWidth + dX,
+             corner_radius=10).place(x=X1, y=Y1)
+
+ctk.CTkLabel(master=frame, text="[ x, y ] =", fg_color="#0066CC", width=2 * StandardWidth - dX, corner_radius=10).place(
+    x=X1,
+    y=Y2)
+entry_x_of_point = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_x_of_point.place(x=X1 + 2 * StandardWidth - dX, y=Y2)
+entry_y_of_point = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_y_of_point.place(x=X1 + 3 * StandardWidth - dX, y=Y2)
+
+ctk.CTkLabel(master=frame, text="Закрепление:", fg_color="#0066CC", width=2 * StandardWidth - dX,
+             corner_radius=10).place(
+    x=X1, y=Y2 + dY)
+entry_boundary_condition = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_boundary_condition.place(x=X1 + 2 * StandardWidth - dX, y=Y2 + dY)
+entry_boundary_condition_parameter = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_boundary_condition_parameter.place(x=X1 + 3 * StandardWidth - dX, y=Y2 + dY)
+
+add_point_button = ctk.CTkButton(master=frame, text="Добавить", command=add_point_function, fg_color="#418433",
+                                 hover_color="#1F4618")
+add_point_button.place(x=5 * StandardWidth - 5, y=Y2 + dY)
+
+# Задание линий: -----------------------------------------------------------------------------------------------------
+ctk.CTkLabel(master=frame, text="Задание линий", text_color='white', fg_color="#7F55F2", width=6 * StandardWidth + dX,
+             corner_radius=10).place(x=X1, y=Y1 + 3 * dY)
+
+ctk.CTkLabel(master=frame, text="[ №1 ,  №2 ] =", fg_color="#0066CC", width=StandardWidth + dX, corner_radius=10).place(
+    x=X1, y=Y2 + 3 * dY)
+entry_num_of_point_1 = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_num_of_point_1.place(x=X1 + StandardWidth + dX, y=Y2 + 3 * dY)
+entry_num_of_point_2 = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_num_of_point_2.place(x=X1 + 2 * StandardWidth + dX, y=Y2 + 3 * dY)
+
+ctk.CTkLabel(master=frame, text="f_n(s) =", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
+    x=X1, y=Y2 + 4 * dY)
+entry_f_n = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_f_n.place(x=X1 + StandardWidth, y=Y2 + 4 * dY)
+
+ctk.CTkLabel(master=frame, text="f_t(s) =", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
+    x=X1 + 2 * StandardWidth + dX, y=Y2 + 4 * dY)
+entry_f_n = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_f_n.place(x=X1 + 3 * StandardWidth + dX, y=Y2 + 4 * dY)
+
+add_line_button = ctk.CTkButton(master=frame, text="Добавить", command=add_line_function, fg_color="#418433",
+                                hover_color="#1F4618")
+add_line_button.place(x=5 * StandardWidth - 5, y=Y2 + 4 * dY)
+
+# SHOW SWITCH  ---------------------------------------------------------------------------------------------------------
+
+ctk.CTkLabel(master=frame, text="Показывать линии", fg_color="#0066CC", width=2 * StandardWidth,
+             corner_radius=10).place(
+    x=X2 - dX, y=8 * Y2 + dY)
+show_lines_switch = ctk.CTkSwitch(master=frame, text="")
+show_lines_switch.place(x=X2 + StandardWidth2 + dX, y=8 * Y2 + dY)
+show_lines_switch.select()
+app.mainloop()
