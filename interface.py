@@ -13,11 +13,6 @@ app.resizable(width=False, height=False)
 
 
 def button_function():
-    show_lines = show_lines_switch.get()
-    if show_lines:
-        plot_points_function(X, Y, BC, BC_parameter, line_points)
-    else:
-        plot_points_function(X, Y, BC, BC_parameter, [])
     img = ctk.CTkImage(Image.open("foo.png"), size=(600, 600))
     label = ctk.CTkLabel(master=frame, image=img, text="")
     label.place(relx=0.7, rely=0.5, anchor=ctk.CENTER)
@@ -54,6 +49,7 @@ point_num = []
 BC = []
 BC_parameter = []
 
+
 def test(condition, condition_parameter):
     flag = 0
     if condition == "":
@@ -69,12 +65,15 @@ def test(condition, condition_parameter):
     if condition == "заделка":
         flag = 1
     return flag
+
+
 def add_point_function():
     global X
     global Y
     global point_num
     global BC
     global BC_parameter
+    global line_points
     x = float(entry_x_of_point.get())
     y = float(entry_y_of_point.get())
     boundary_condition = entry_boundary_condition.get()
@@ -87,21 +86,35 @@ def add_point_function():
         Y.append(y)
         BC.append(boundary_condition)
         BC_parameter.append(boundary_condition_parameter)
-        plot_points_function(X, Y, BC, BC_parameter, [])
+        if line_points:
+            plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0)
+        else:
+            plot_points_function(X, Y, BC, BC_parameter, [], [], 0)
         button_function()
 
 
 line_points = []
+element_number = []
 
 
 def add_line_function():
     global line_points
+    global element_number
     num_of_point_1 = int(entry_num_of_point_1.get())
     num_of_point_2 = int(entry_num_of_point_2.get())
+    elem_number = int(entry_elem_number.get())
+    element_number.append(elem_number)
     line_points.append([num_of_point_1, num_of_point_2])
-    plot_points_function(X, Y, BC, BC_parameter, line_points)
+    plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0)
+    show_lines = show_lines_switch.get()
+    # if show_lines:
+    #     plot_points_function(X, Y, BC, BC_parameter, line_points, elem_number)
+    # else:
+    #     plot_points_function(X, Y, BC, BC_parameter, [], elem_number)
     button_function()
 
+def solve_function():
+    plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 1)
 
 # My windows: --------------------------------------------------------------------------------------------------------
 
@@ -140,6 +153,13 @@ entry_num_of_point_1.place(x=X1 + StandardWidth + dX, y=Y2 + 3 * dY)
 entry_num_of_point_2 = ctk.CTkEntry(master=frame, width=StandardWidth)
 entry_num_of_point_2.place(x=X1 + 2 * StandardWidth + dX, y=Y2 + 3 * dY)
 
+ctk.CTkLabel(master=frame, text="количество элементов:", fg_color="#0066CC", width=StandardWidth + dX,
+             corner_radius=10).place(
+    x=X1 + 3 * StandardWidth + 2 * dX, y=Y2 + 3 * dY)
+entry_elem_number = ctk.CTkEntry(master=frame, width=StandardWidth - dX)
+entry_elem_number.place(x=X1 + 5 * StandardWidth + 2 * dX, y=Y2 + 3 * dY)
+entry_elem_number.insert(0, 1)
+
 ctk.CTkLabel(master=frame, text="f_n(s) =", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
     x=X1, y=Y2 + 4 * dY)
 entry_f_n = ctk.CTkEntry(master=frame, width=StandardWidth)
@@ -162,4 +182,9 @@ ctk.CTkLabel(master=frame, text="Показывать линии", fg_color="#00
 show_lines_switch = ctk.CTkSwitch(master=frame, text="")
 show_lines_switch.place(x=X2 + StandardWidth2 + dX, y=8 * Y2 + dY)
 show_lines_switch.select()
+
+add_line_button = ctk.CTkButton(master=frame, text="Решить", command=solve_function, fg_color="#418433",
+                                hover_color="#1F4618")
+add_line_button.place(x=5 * StandardWidth - 5, y=Y2 + 8 * dY)
+
 app.mainloop()

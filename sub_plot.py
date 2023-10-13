@@ -1,13 +1,18 @@
 import matplotlib.pyplot as plt
 import numpy as np
+from data import nodes_function
+from first_generalization import solution
 
 # number_of_point = 1
 point_num = []
 
+nodes = np.array([])
 
-def plot_points_function(X, Y, BC, BC_parameter, line_points):
+
+def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, solve):
     # global number_of_point
     global point_num
+    global nodes
     # if add_point == 1:
     #     point_num.append(number_of_point)
     point_num = np.linspace(1, len(X), len(X))
@@ -79,14 +84,24 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points):
             plt.plot(base_x, base_y, color="red", marker="o")
             correct_input = 1
         if correct_input == 1:
-            plt.text(x + d / 2, y + d / 2, f'{i + 1}')
-        # if correct_input == 1 and add_point == 1:
-        #     number_of_point += 1
-        #     print(number_of_point)
+            plt.text(x - d / 2, y + d / 2, f'{i + 1}', color="green")
     if line_points:
+        [X_nodes, Y_nodes] = nodes_function(X, Y, line_points, element_number)
+        num = 0
         for l in range(0, len(line_points)):
-            plt.plot([X[line_points[l][0] - 1], X[line_points[l][1] - 1]],
-                     [Y[line_points[l][0] - 1], Y[line_points[l][1] - 1]])
+            # plt.plot([X[line_points[l][0] - 1], X[line_points[l][1] - 1]],
+            #          [Y[line_points[l][0] - 1], Y[line_points[l][1] - 1]])
+            plt.plot(X_nodes[l], Y_nodes[l], marker="o", color="black")
+            for j in range(0, len(X_nodes[l])):
+                if j != 0 or l == 0:
+                    print(num)
+                    plt.text(X_nodes[l][j] + d / 2, Y_nodes[l][j] + d / 2, f'{num + 1}', color="black")
+                    if solve:
+                        nodes = np.append(nodes, [X_nodes[l][j], Y_nodes[l][j]])
+                    num += 1
     plt.axis('equal')
     plt.grid()
     plt.savefig('foo.png')
+    if solve:
+        solution()
+
