@@ -26,8 +26,8 @@ empty_label = ctk.CTkLabel(master=frame, image=empty_img, text="")
 empty_label.place(relx=0.7, rely=0.5, anchor=ctk.CENTER)
 
 button = ctk.CTkButton(master=frame, text="Обновить график", command=button_function)
-button.place(relx=0.1, rely=0.8, anchor=ctk.CENTER)
-
+# button.place(relx=0.1, rely=0.8, anchor=ctk.CENTER)
+button.place(x=3 * 80 - 5, y=60 + 10 * 50)
 # My settings: --------------------------------------------------------------------------------------------------------
 X1 = 30
 X2 = 250
@@ -48,6 +48,7 @@ Y = []
 point_num = []
 BC = []
 BC_parameter = []
+Forces = []
 
 
 def test(condition, condition_parameter):
@@ -87,9 +88,9 @@ def add_point_function():
         BC.append(boundary_condition)
         BC_parameter.append(boundary_condition_parameter)
         if line_points:
-            plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0)
+            plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0, Forces)
         else:
-            plot_points_function(X, Y, BC, BC_parameter, [], [], 0)
+            plot_points_function(X, Y, BC, BC_parameter, [], [], 0, Forces)
         button_function()
 
 
@@ -105,17 +106,29 @@ def add_line_function():
     elem_number = int(entry_elem_number.get())
     element_number.append(elem_number)
     line_points.append([num_of_point_1, num_of_point_2])
-    plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0)
-    show_lines = show_lines_switch.get()
+    plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0, Forces)
+    # show_lines = show_lines_switch.get()
     # if show_lines:
     #     plot_points_function(X, Y, BC, BC_parameter, line_points, elem_number)
     # else:
     #     plot_points_function(X, Y, BC, BC_parameter, [], elem_number)
     button_function()
 
+
 def solve_function():
-    plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 1)
+    plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 1, Forces)
     button_function()
+
+
+def add_force_function():
+    global Forces
+    F_x = int(entry_F_x.get())
+    F_y = int(entry_F_y.get())
+    M = int(entry_M.get())
+    node_force_number = int(entry_num_of_nodes.get())
+    Forces.append([node_force_number, F_x, F_y, M])
+
+
 # My windows: --------------------------------------------------------------------------------------------------------
 
 # Задание точек: -----------------------------------------------------------------------------------------------------
@@ -174,17 +187,46 @@ add_line_button = ctk.CTkButton(master=frame, text="Добавить", command=a
                                 hover_color="#1F4618")
 add_line_button.place(x=5 * StandardWidth - 5, y=Y2 + 4 * dY)
 
+# Задание узловых сил: -----------------------------------------------------------------------------------------------------
+ctk.CTkLabel(master=frame, text="Задание узловых сил", text_color='white', fg_color="#7F55F2",
+             width=6 * StandardWidth + dX,
+             corner_radius=10).place(x=X1, y=Y1 + 7 * dY)
+
+ctk.CTkLabel(master=frame, text="узел №", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
+    x=X1, y=Y2 + 7 * dY)
+entry_num_of_nodes = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_num_of_nodes.place(x=X1 + StandardWidth, y=Y2 + 7 * dY)
+
+ctk.CTkLabel(master=frame, text="F_x", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
+    x=X1, y=Y2 + 8 * dY)
+entry_F_x = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_F_x.place(x=X1 + StandardWidth, y=Y2 + 8 * dY)
+
+ctk.CTkLabel(master=frame, text="F_y", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
+    x=X1 + 2 * StandardWidth + int(dX / 2), y=Y2 + 8 * dY)
+entry_F_y = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_F_y.place(x=X1 + 3 * StandardWidth + int(dX / 2), y=Y2 + 8 * dY)
+
+ctk.CTkLabel(master=frame, text="M", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
+    x=X1 + 4 * StandardWidth + dX, y=Y2 + 8 * dY)
+entry_M = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_M.place(x=X1 + 5 * StandardWidth + dX, y=Y2 + 8 * dY)
+
+add_force_button = ctk.CTkButton(master=frame, text="Добавить", command=add_force_function, fg_color="#418433",
+                                 hover_color="#1F4618")
+add_force_button.place(x=5 * StandardWidth - 5, y=Y2 + 7 * dY)
+
 # SHOW SWITCH  ---------------------------------------------------------------------------------------------------------
 
-ctk.CTkLabel(master=frame, text="Показывать линии", fg_color="#0066CC", width=2 * StandardWidth,
-             corner_radius=10).place(
-    x=X2 - dX, y=8 * Y2 + dY)
-show_lines_switch = ctk.CTkSwitch(master=frame, text="")
-show_lines_switch.place(x=X2 + StandardWidth2 + dX, y=8 * Y2 + dY)
-show_lines_switch.select()
+# ctk.CTkLabel(master=frame, text="Показывать линии", fg_color="#0066CC", width=2 * StandardWidth,
+#              corner_radius=10).place(
+#     x=X2 - dX, y=8 * Y2 + dY)
+# show_lines_switch = ctk.CTkSwitch(master=frame, text="")
+# show_lines_switch.place(x=X2 + StandardWidth2 + dX, y=8 * Y2 + dY)
+# show_lines_switch.select()
 
 add_line_button = ctk.CTkButton(master=frame, text="Решить", command=solve_function, fg_color="#418433",
                                 hover_color="#1F4618")
-add_line_button.place(x=5 * StandardWidth - 5, y=Y2 + 8 * dY)
+add_line_button.place(x=5 * StandardWidth - 5, y=Y2 + 10 * dY)
 
 app.mainloop()
