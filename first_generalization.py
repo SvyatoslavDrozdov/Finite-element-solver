@@ -2,66 +2,16 @@ import numpy as np
 # from data import nodes, elements, nodes_restrictions, force_vector, element_properties
 import matplotlib.pyplot as plt
 
-nodes = np.array([
-    [0, 0],  # first node
-    [1, 1],  # second node
-    [2, 0],  # third node
-    [1, 2],  # fourth node
-    [2, 2],  # fifth node
-])
 
-R = 0.01
-E = 2.1E11
-A = np.pi * R ** 2
-I = np.pi * R ** 4 / 4
-element_properties = np.array([
-    [E, A, I],
-    [E, A, I],
-    [E, A, I],
-    [E, A, I]
-])
-
-elements = np.array([
-    [1, 2],  # first element
-    [2, 3],  # second element
-    [2, 4],  # third element
-    [4, 5],  # fourth element
-])
-
-
-nodes_restrictions = [
-    ["hard seal", None],
-    ["movable hinge OY", None],
-    ["movable hinge OX", None],
-    ["movable hinge Cx", 1],
-    ["movable hinge Cx", 4]
-]
-F_x_1 = 0
-F_y_1 = 0
-M_1 = 0
-F_x_2 = 0
-F_y_2 = -250_000_0
-M_2 = 0
-F_x_3 = 0
-F_y_3 = 0
-M_3 = 0
-F_x_4 = 0
-F_y_4 = 0
-M_4 = 0
-F_x_5 = 0
-F_y_5 = 0
-M_5 = 0
-
-force_vector = np.array([F_y_2, M_2, F_x_3, M_3, F_x_4, F_y_4, M_4, F_x_5, F_y_5, M_5])
 def solution(nodes, elements, nodes_restrictions, force_vector, element_properties):
     def local_stiffness_matrix_function(prop, e_num):
         E = prop[0]
         A = prop[1]
         I = prop[2]
-        [first_node, second_node] = elements[e_num]
-        [x_i, y_i] = nodes[first_node - 1]
-        [x_j, y_j] = nodes[second_node - 1]
-        L = ((x_i - x_j) ** 2 + (y_i - y_j) ** 2) ** 0.5
+        [node_1, node_2] = elements[e_num]
+        [x_1i, y_1i] = nodes[node_1 - 1]
+        [x_2j, y_2j] = nodes[node_2 - 1]
+        L = ((x_1i - x_2j) ** 2 + (y_1i - y_2j) ** 2) ** 0.5
         EAL = E * A / L
         EIL3 = 12 * E * I / L ** 3
         EIL2 = 6 * E * I / L ** 2
@@ -77,10 +27,8 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
         ])
         return stiffness_matrix
 
-
     nodes_number = len(nodes)
     elements_number = len(elements)
-
 
     def T(our_element):
         [x_1, y_1] = nodes[our_element[0] - 1]
@@ -96,7 +44,6 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
             [0, 0, 0, 0, 0, 1]
         ])
         return rotation_matrix
-
 
     global_element_stiffness_matrix = []
     e = 0
@@ -125,12 +72,10 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
     global_stiffness_matrix = np.dot(np.dot(H.transpose(), stiffness_diagonal_matrix), H)
     global_len = len(global_stiffness_matrix)
 
-
     def delete_raw_and_column(matrix, number):
         new_matrix = np.hstack((matrix[:, 0:number], matrix[:, number + 1:]))
         new_matrix = np.vstack((new_matrix[:number], new_matrix[number + 1:]))
         return new_matrix
-
 
     node_num = 0
     for nodes_restriction in nodes_restrictions:
@@ -246,7 +191,6 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
         e += 1
     local_displacement = local_displacement.reshape(elements_number, 6)
 
-
     def v(point_coordinate, element_nodes_displacement, lgth):
         N = np.array([
             1 - 3 * point_coordinate ** 2 / lgth ** 2 + 2 * point_coordinate ** 3 / lgth ** 3,
@@ -256,17 +200,14 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
         ])
         return np.dot(N.transpose(), element_nodes_displacement)
 
-
     def u(point_coordinate, U_1_2, lgth):
         return (U_1_2[1] - U_1_2[0]) * point_coordinate / lgth + U_1_2[0]
 
-
     def linear_function(variable, r_1, r_2):
-        return (r_2[1] - r_1[1]) / (r_2[0] - r_1[0]) * variable + (r_1[1] * r_2[0] - r_2[1] * r_1[0]) / (r_2[0] - r_1[0])
-
+        return (r_2[1] - r_1[1]) / (r_2[0] - r_1[0]) * variable + (r_1[1] * r_2[0] - r_2[1] * r_1[0]) / (
+                r_2[0] - r_1[0])
 
     graph_points_number = 21
-
 
     def initial_element_position(element_number):
         [node_i, node_j] = elements[element_number - 1]
@@ -280,7 +221,6 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
             Y = linear_function(X, [x_i, y_i], [x_j, y_j])
         return [X, Y]
 
-
     def new_element_position(element_number):
         [node_i, node_j] = elements[element_number - 1]
         [x_i, y_i] = nodes[node_i - 1]
@@ -290,7 +230,8 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
         sin_alpha = (y_j - y_i) / Length
         cos_alpha = (x_j - x_i) / Length
         local_variable = np.linspace(0, Length, graph_points_number)
-        U_disp = u(local_variable, [local_displacement[element_number - 1][0], local_displacement[element_number - 1][3]],
+        U_disp = u(local_variable,
+                   [local_displacement[element_number - 1][0], local_displacement[element_number - 1][3]],
                    Length)
         V_disp = v(local_variable, [local_displacement[element_number - 1][1],
                                     local_displacement[element_number - 1][2],
@@ -366,6 +307,4 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
     plt.grid()
     plt.savefig('foo.png')
 
-    plt.show()
-
-solution(nodes, elements, nodes_restrictions, force_vector, element_properties)
+    # plt.show()

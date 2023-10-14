@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def nodes_function(X, Y, line_points, element_number, solve):
+def nodes_function(X, Y, line_points, element_number):
     X_node = []
     Y_node = []
     for l in range(0, len(line_points)):
