@@ -15,7 +15,7 @@ counter_for_nodes = 0
 #     [1, 2],  # fourth node
 #     [2, 2],  # fifth node
 # ])
-nodes = np.array([])
+# nodes = np.array([])
 R = 0.01
 E = 2.1E11
 A = np.pi * R ** 2
@@ -27,12 +27,12 @@ element_properties = np.array([
     [E, A, I]
 ])
 
-elements = np.array([
-    [1, 2],  # first element
-    [2, 3],  # second element
-    [2, 4],  # third element
-    [4, 5],  # fourth element
-])
+# elements = np.array([
+#     [1, 2],  # first element
+#     [2, 3],  # second element
+#     [2, 4],  # third element
+#     [4, 5],  # fourth element
+# ])
 
 nodes_restrictions = [
     ["hard seal", None],
@@ -62,6 +62,7 @@ force_vector = np.array([F_y_2, M_2, F_x_3, M_3, F_x_4, F_y_4, M_4, F_x_5, F_y_5
 
 def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, solve):
     # global number_of_point
+    boundary_condition_matrix = []
     global point_num
     global nodes
     global counter_for_nodes
@@ -92,11 +93,12 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
             d = max(max(Y), -min(Y), max(X), -min(X)) / 10
         x = X[i]
         y = Y[i]
-        point_number = point_num[i]
+        # point_number = point_num[i]
         boundary_condition = BC[i]
         boundary_condition_parameter = BC_parameter[i]
         boundary_condition = rename_boundary_condition(boundary_condition, boundary_condition_parameter)
 
+        boundary_condition_matrix.append([boundary_condition, boundary_condition_parameter])
         correct_input = 0
 
         if boundary_condition == "free":
@@ -156,21 +158,8 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
                 if point_2 not in element_points:
                     nodes = np.append(nodes, [X_element[-1], Y_element[-1]])
                     element_points.add(point_2)
-            # print(nodes)
-            nodes = nodes.reshape(int(len(nodes) / 2), 2)
-            # print(f"X = {X}")
-            # print(f"line_points = {line_points}")
-            # print(f"X_nodes = {X_nodes}")
-            # print(f"Y_nodes = {Y_nodes}")
-            # print(f"nodes = {nodes}")
 
-        # num = 0
-        # for l in range(0, len(line_points)):
-        #     plt.plot(X_nodes[l], Y_nodes[l], marker="o", color="black")
-        #     for j in range(0, len(X_nodes[l])):
-        #         if j != 0 or l == 0:
-        #             plt.text(X_nodes[l][j] + d / 2, Y_nodes[l][j] + d / 2, f'{num + 1}', color="black")
-        #             num += 1
+            nodes = nodes.reshape(int(len(nodes) / 2), 2)
 
         num = 0
         element_points = set()
@@ -192,11 +181,10 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
                 element_points.add(point_2)
                 num += 1
 
-
     plt.axis('equal')
     plt.grid()
     plt.savefig('foo.png')
 
     if solve:
-        #     print(nodes)
-        solution(nodes, elements, nodes_restrictions, force_vector, element_properties)
+        # print(f"boundary_condition_matrix = {boundary_condition_matrix}")
+        solution(nodes, line_points, boundary_condition_matrix, force_vector, element_properties)
