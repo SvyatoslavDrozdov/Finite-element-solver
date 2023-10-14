@@ -48,6 +48,8 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
     global_element_stiffness_matrix = []
     e = 0
     for element in elements:
+        # print(f"e = {e}")
+        # print(f"element_properties[e] = {element_properties[e]}")
         local_stiffness_matrix = local_stiffness_matrix_function(element_properties[e], e)
         stiffness = np.dot(np.dot(T(element).transpose(), local_stiffness_matrix), T(element))
         global_element_stiffness_matrix.append(stiffness)
@@ -258,10 +260,20 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
     # plt.title("Расчет балочной конструкции")
 
     Length_max = 0
+    # Y_min = 0
+    # Y_max = 0
     for e in range(0, elements_number):
         [first_node, second_node] = elements[e]
         [x_i, y_i] = nodes[first_node - 1]
+        # if Y_min > y_i:
+        #     Y_min = y_i
+        # if Y_max < y_i:
+        #     Y_max = y_i
         [x_j, y_j] = nodes[second_node - 1]
+        # if Y_min > y_j:
+        #     Y_min = y_j
+        # if Y_max < y_j:
+        #     Y_max = y_j
         Length = ((x_i - x_j) ** 2 + (y_i - y_j) ** 2) ** 0.5
         if Length_max < Length:
             Length_max = Length
@@ -303,6 +315,7 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
             plt.plot(base_x, base_y, color="red")
 
         node_num += 1
+    # plt.ylim(Y_min - 0.3 * abs(Y_min), Y_max + 0.3*abs(Y_max))
     plt.axis('equal')
     plt.grid()
     plt.savefig('foo.png')

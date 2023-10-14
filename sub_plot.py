@@ -144,29 +144,47 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
         [X_nodes, Y_nodes] = nodes_function(X, Y, line_points, element_number)
         if solve:
             node_line_correspondence = []
+            all_node_line_correspondence = []
+            all_nodes_on_element_array = []
             nodes = np.array([])
             element_points = set()
+            node_counted = 0
             for e in range(0, len(X_nodes)):
                 point_1 = line_points[e][0]
                 point_2 = line_points[e][1]
 
                 Y_element = Y_nodes[e]
                 X_element = X_nodes[e]
+
+                nodes_on_element = set()
+                nodes_on_element_array = []
                 if point_1 not in element_points:
                     nodes = np.append(nodes, [X_element[0], Y_element[0]])
+                    node_counted += 1
+                    nodes_on_element.add(node_counted)
+                    nodes_on_element_array.append(node_counted)
                     node_line_correspondence.append([line_points[e][0], int(len(nodes) / 2)])
                     element_points.add(point_1)
+
                 for i in range(1, len(X_element) - 1):
                     nodes = np.append(nodes, [X_element[i], Y_element[i]])
+                    node_counted += 1
+                    nodes_on_element.add(node_counted)
+                    nodes_on_element_array.append(node_counted)
                 if point_2 not in element_points:
                     nodes = np.append(nodes, [X_element[-1], Y_element[-1]])
+                    node_counted += 1
+                    nodes_on_element.add(node_counted)
+                    nodes_on_element_array.append(node_counted)
                     node_line_correspondence.append([line_points[e][1], int(len(nodes) / 2)])
                     element_points.add(point_2)
-
+                all_node_line_correspondence.append(nodes_on_element)
+                all_nodes_on_element_array.append(nodes_on_element_array)
             nodes = nodes.reshape(int(len(nodes) / 2), 2)
 
         num = 0
         element_points = set()
+
         for e in range(0, len(X_nodes)):
             point_1 = line_points[e][0]
             point_2 = line_points[e][1]
@@ -196,17 +214,14 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
         boundary = \
             create_force_and_boundary(node_line_correspondence, nodes, line_points, boundary_condition_matrix, Forces)[
                 1]
-        force = force.reshape(3 * len(force))
+        # force = force.reshape(3 * len(force))
         # print(node_line_correspondence)
         # print(f"boundary_condition_matrix = {boundary_condition_matrix}")
         # print(f"boundary = f{boundary}")
-        element_properties = []
-        for i in range(0, len(line_points)):
-            element_properties.append([E, A, I])
 
         elements = []
         e = 0
-        print(line_points)
+        # print(line_points)
         for line in line_points:
             n_1 = line[0]
             n_2 = line[1]
@@ -215,18 +230,33 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
                     node_1 = node_line_correspondence[i][1]
                 if node_line_correspondence[i][0] == n_2:
                     node_2 = node_line_correspondence[i][1]
-            print(f"node_1 = {node_1}")
-            print(f"node_1 = {node_2}")
+            # print(f"node_1 = {node_1}")
+            # print(f"node_1 = {node_2}")
             E_N = element_number[e]
-            print(f"E_N = {E_N}")
-            if node_1 < node_2:
-                for j in range(0, E_N-1):
-                    elements.append([node_1 + j * E_N, node_1 + (j + 1) * E_N])
-                elements.append([node_1 + E_N-1, node_2])
-            else:
+            # print(f"E_N = {E_N}")
+            if node_1 in all_node_line_correspondence[e] and node_2 in all_node_line_correspondence[e]:
                 for j in range(0, E_N):
-                    elements.append([node_1 + j * E_N, node_1 + (j + 1) * E_N])
+                    elements.append([node_1 + j, node_1 + j + 1])
+            elif node_1 in all_node_line_correspondence[e]:
+                for j in range(0, E_N - 1):
+                    elements.append([node_1 + j, node_1 + j + 1])
+                elements.append([node_1, all_nodes_on_element_array[e][-1]])
+            elif node_2 in all_node_line_correspondence[e]:
+                elements.append([node_1, all_nodes_on_element_array[e][0]])
+                for j in range(0, len(all_nodes_on_element_array[e]) - 1):
+                    elements.append([all_nodes_on_element_array[e][j], all_nodes_on_element_array[e][j+1]])
+            else:
+                elements.append([node_1, all_nodes_on_element_array[e][0]])
+                for j in range(0, len(all_nodes_on_element_array[e]) - 1):
+                    elements.append([all_nodes_on_element_array[e][j], all_nodes_on_element_array[e][j+1]])
+                elements.append([all_nodes_on_element_array[e][-1], node_2])
             e += 1
-        print(elements)
+        element_properties = []
+        for i in range(0, len(elements)):
+            element_properties.append([E, A, I])
+        # print(elements)
+        # print(f"all_node_line_correspondence = {all_node_line_correspondence}")
+        # print(f"all_nodes_on_element_array = {all_nodes_on_element_array}")
+
         # solution(nodes, line_points, boundary, force, element_properties)
         solution(nodes, elements, boundary, force, element_properties)

@@ -50,6 +50,46 @@ def create_force_and_boundary(node_line_correspondence, nodes, line_points, boun
             f = np.append(f[:node_number - 1 - deleted], f[node_number - deleted:])
             deleted += 1
             f = f.reshape(int(len(f) / 3), 3)
+            # print(f"f_1 = {f}")
+        if boundary[0] == "hinge":
+            for l in range(0, len(node_line_correspondence)):
+                if node_line_correspondence[l][0] == point:
+                    node_number = node_line_correspondence[l][1]
+            add_f = f[node_number - deleted:]
+            f = np.append(f[:node_number - 1 - deleted], ["*", "*", f[node_number - 1 - deleted][2]])
+
+            f = np.append(f, add_f)
+
+            f = f.reshape(int(len(f) / 3), 3)
+        if boundary[0] == "movable hinge OX":
+            for l in range(0, len(node_line_correspondence)):
+                if node_line_correspondence[l][0] == point:
+                    node_number = node_line_correspondence[l][1]
+            add_f = f[node_number - deleted:]
+            f = np.append(f[:node_number - 1 - deleted],
+                          [f[node_number - 1 - deleted][0], "*", f[node_number - 1 - deleted][2]])
+            f = np.append(f, add_f)
+        if boundary[0] == "movable hinge OY":
+            for l in range(0, len(node_line_correspondence)):
+                if node_line_correspondence[l][0] == point:
+                    node_number = node_line_correspondence[l][1]
+            add_f = f[node_number - deleted:]
+            f = np.append(f[:node_number - 1 - deleted],
+                          ["*", f[node_number - 1 - deleted][1], f[node_number - 1 - deleted][2]])
+            f = np.append(f, add_f)
+
+            f = f.reshape(int(len(f) / 3), 3)
+    f = f.reshape(3 * len(f))
+    f = list(f)
+
+    for i in range(0, len(f)):
+        try:
+            f.remove("*")
+        except:
+            pass
+    for i in range(0, len(f)):
+        f[i] = float(f[i])
+    print(f)
     # print(f)
     # print(f.reshape(3 * len(f)))
     return [f, all_boundary]
