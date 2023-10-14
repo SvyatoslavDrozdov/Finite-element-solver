@@ -40,6 +40,8 @@ def create_force_and_boundary(node_line_correspondence, nodes, line_points, boun
     deleted = 0
     for boundary in boundary_condition_matrix:
         point += 1
+        if point >= 2:
+            print(f)
         if boundary[0] == "hard seal":
             for l in range(0, len(node_line_correspondence)):
                 if node_line_correspondence[l][0] == point:
@@ -61,6 +63,7 @@ def create_force_and_boundary(node_line_correspondence, nodes, line_points, boun
             f = np.append(f, add_f)
 
             f = f.reshape(int(len(f) / 3), 3)
+        # print(boundary[0])
         if boundary[0] == "movable hinge OX":
             for l in range(0, len(node_line_correspondence)):
                 if node_line_correspondence[l][0] == point:
@@ -69,6 +72,7 @@ def create_force_and_boundary(node_line_correspondence, nodes, line_points, boun
             f = np.append(f[:node_number - 1 - deleted],
                           [f[node_number - 1 - deleted][0], "*", f[node_number - 1 - deleted][2]])
             f = np.append(f, add_f)
+            f = f.reshape(int(len(f) / 3), 3)
         if boundary[0] == "movable hinge OY":
             for l in range(0, len(node_line_correspondence)):
                 if node_line_correspondence[l][0] == point:
@@ -77,7 +81,6 @@ def create_force_and_boundary(node_line_correspondence, nodes, line_points, boun
             f = np.append(f[:node_number - 1 - deleted],
                           ["*", f[node_number - 1 - deleted][1], f[node_number - 1 - deleted][2]])
             f = np.append(f, add_f)
-
             f = f.reshape(int(len(f) / 3), 3)
     f = f.reshape(3 * len(f))
     f = list(f)
