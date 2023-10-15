@@ -9,59 +9,14 @@ point_num = []
 nodes = np.array([])
 counter_for_nodes = 0
 
-# nodes = np.array([
-#     [0, 0],  # first node
-#     [1, 1],  # second node
-#     [2, 0],  # third node
-#     [1, 2],  # fourth node
-#     [2, 2],  # fifth node
-# ])
-# nodes = np.array([])
 R = 0.01
 E = 2.1E11
 A = np.pi * R ** 2
 I = np.pi * R ** 4 / 4
-# element_properties = np.array([
-#     [E, A, I],
-#     [E, A, I],
-#     [E, A, I],
-#     [E, A, I]
-# ])
-
-# elements = np.array([
-#     [1, 2],  # first element
-#     [2, 3],  # second element
-#     [2, 4],  # third element
-#     [4, 5],  # fourth element
-# ])
-
-nodes_restrictions = [
-    ["hard seal", None],
-    ["movable hinge OY", None],
-    ["movable hinge OX", None],
-    ["movable hinge Cx", 1],
-    ["movable hinge Cx", 4]
-]
-F_x_1 = 0
-F_y_1 = 0
-M_1 = 0
-F_x_2 = 0
-F_y_2 = -250_000_0
-M_2 = 0
-F_x_3 = 0
-F_y_3 = 0
-M_3 = 0
-F_x_4 = 0
-F_y_4 = 0
-M_4 = 0
-F_x_5 = 0
-F_y_5 = 0
-M_5 = 0
-
-force_vector = np.array([F_y_2, M_2, F_x_3, M_3, F_x_4, F_y_4, M_4, F_x_5, F_y_5, M_5])
 
 
-def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, solve, Forces):
+def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, solve, Forces, E_vector, A_vector,
+                         I_vector):
     # global number_of_point
     boundary_condition_matrix = []
     global point_num
@@ -208,16 +163,12 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
     plt.savefig('foo.png')
 
     if solve:
+
         force = \
-            create_force_and_boundary(node_line_correspondence, nodes, line_points, boundary_condition_matrix, Forces)[
-                0]
-        boundary = \
-            create_force_and_boundary(node_line_correspondence, nodes, line_points, boundary_condition_matrix, Forces)[
-                1]
-        # force = force.reshape(3 * len(force))
-        # print(node_line_correspondence)
-        # print(f"boundary_condition_matrix = {boundary_condition_matrix}")
-        # print(f"boundary = f{boundary}")
+            create_force_and_boundary(node_line_correspondence, nodes, line_points, boundary_condition_matrix, Forces)
+        # boundary = \
+        #     create_force_and_boundary(node_line_correspondence, nodes, line_points, boundary_condition_matrix, Forces)[
+        #         1]
 
         elements = []
         e = 0
@@ -230,10 +181,7 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
                     node_1 = node_line_correspondence[i][1]
                 if node_line_correspondence[i][0] == n_2:
                     node_2 = node_line_correspondence[i][1]
-            # print(f"node_1 = {node_1}")
-            # print(f"node_1 = {node_2}")
             E_N = element_number[e]
-            # print(f"E_N = {E_N}")
             if node_1 in all_node_line_correspondence[e] and node_2 in all_node_line_correspondence[e]:
                 for j in range(0, E_N):
                     elements.append([node_1 + j, node_1 + j + 1])
@@ -244,19 +192,37 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
             elif node_2 in all_node_line_correspondence[e]:
                 elements.append([node_1, all_nodes_on_element_array[e][0]])
                 for j in range(0, len(all_nodes_on_element_array[e]) - 1):
-                    elements.append([all_nodes_on_element_array[e][j], all_nodes_on_element_array[e][j+1]])
+                    elements.append([all_nodes_on_element_array[e][j], all_nodes_on_element_array[e][j + 1]])
             else:
-                elements.append([node_1, all_nodes_on_element_array[e][0]])
-                for j in range(0, len(all_nodes_on_element_array[e]) - 1):
-                    elements.append([all_nodes_on_element_array[e][j], all_nodes_on_element_array[e][j+1]])
-                elements.append([all_nodes_on_element_array[e][-1], node_2])
+                try:
+                    elements.append([node_1, all_nodes_on_element_array[e][0]])
+                    for j in range(0, len(all_nodes_on_element_array[e]) - 1):
+                        elements.append([all_nodes_on_element_array[e][j], all_nodes_on_element_array[e][j + 1]])
+                    elements.append([all_nodes_on_element_array[e][-1], node_2])
+                except:
+                    elements.append([node_1, node_2])
             e += 1
         element_properties = []
+
         for i in range(0, len(elements)):
-            element_properties.append([E, A, I])
+            # element_properties.append([E, A, I])
+            element_properties.append([E_vector[i], A_vector[i], I_vector[i]])
         # print(elements)
         # print(f"all_node_line_correspondence = {all_node_line_correspondence}")
         # print(f"all_nodes_on_element_array = {all_nodes_on_element_array}")
-
         # solution(nodes, line_points, boundary, force, element_properties)
-        solution(nodes, elements, boundary, force, element_properties)
+
+        updated_boundary_condition_matrix = []
+        for i in range(0, len(boundary_condition_matrix)):
+            updated_boundary_condition_matrix.append(["free", ""])
+        for points in range(0, len(boundary_condition_matrix)):
+            for p in range(0, len(boundary_condition_matrix)):
+                if node_line_correspondence[p][0] == points + 1:
+                    updated_boundary_condition_matrix[node_line_correspondence[p][1] - 1] = boundary_condition_matrix[
+                        points]
+
+        # print(f"updated_boundary_condition_matrix = {updated_boundary_condition_matrix}")
+        # print(f"boundary_condition_matrix = {boundary_condition_matrix}")
+        # print(f"node_line_correspondence = {node_line_correspondence}")
+        # print(f"boundary = {boundary}")
+        solution(nodes, elements, updated_boundary_condition_matrix, force, element_properties)

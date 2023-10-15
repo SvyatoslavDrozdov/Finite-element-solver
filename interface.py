@@ -88,35 +88,47 @@ def add_point_function():
         BC.append(boundary_condition)
         BC_parameter.append(boundary_condition_parameter)
         if line_points:
-            plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0, Forces)
+            plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0, Forces, E_vector, A_vector,
+                                 I_vector)
         else:
-            plot_points_function(X, Y, BC, BC_parameter, [], [], 0, Forces)
+            plot_points_function(X, Y, BC, BC_parameter, [], [], 0, Forces, [], [], [])
         button_function()
 
 
 line_points = []
 element_number = []
+E_vector = []
+A_vector = []
+I_vector = []
 
 
 def add_line_function():
     global line_points
     global element_number
+    global E_vector
+    global A_vector
+    global I_vector
+
+    E = float(entry_E.get())
+    A = float(entry_A.get())
+    I = float(entry_I.get())
+    E_vector.append(E)
+    A_vector.append(A)
+    I_vector.append(I)
+
     num_of_point_1 = int(entry_num_of_point_1.get())
     num_of_point_2 = int(entry_num_of_point_2.get())
+    line_points.append([num_of_point_1, num_of_point_2])
+
     elem_number = int(entry_elem_number.get())
     element_number.append(elem_number)
-    line_points.append([num_of_point_1, num_of_point_2])
-    plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0, Forces)
-    # show_lines = show_lines_switch.get()
-    # if show_lines:
-    #     plot_points_function(X, Y, BC, BC_parameter, line_points, elem_number)
-    # else:
-    #     plot_points_function(X, Y, BC, BC_parameter, [], elem_number)
+
+    plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0, Forces, E_vector, A_vector, I_vector)
     button_function()
 
 
 def solve_function():
-    plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 1, Forces)
+    plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 1, Forces, E_vector, A_vector, I_vector)
     button_function()
 
 
@@ -179,9 +191,27 @@ entry_f_n = ctk.CTkEntry(master=frame, width=StandardWidth)
 entry_f_n.place(x=X1 + StandardWidth, y=Y2 + 4 * dY)
 
 ctk.CTkLabel(master=frame, text="f_t(s) =", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
-    x=X1 + 2 * StandardWidth + dX, y=Y2 + 4 * dY)
+    x=X1 + 2 * StandardWidth + int(dX / 2), y=Y2 + 4 * dY)
 entry_f_n = ctk.CTkEntry(master=frame, width=StandardWidth)
-entry_f_n.place(x=X1 + 3 * StandardWidth + dX, y=Y2 + 4 * dY)
+entry_f_n.place(x=X1 + 3 * StandardWidth + int(dX / 2), y=Y2 + 4 * dY)
+
+ctk.CTkLabel(master=frame, text="E =", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
+    x=X1, y=Y2 + 5 * dY)
+entry_E = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_E.place(x=X1 + StandardWidth, y=Y2 + 5 * dY)
+entry_E.insert(0, "2.1e11")
+
+ctk.CTkLabel(master=frame, text="A =", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
+    x=X1 + 2 * StandardWidth + int(dX / 2), y=Y2 + 5 * dY)
+entry_A = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_A.place(x=X1 + 3 * StandardWidth + int(dX / 2), y=Y2 + 5 * dY)
+entry_A.insert(0, "3.142e-4")
+
+ctk.CTkLabel(master=frame, text="I =", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
+    x=X1 + 4 * StandardWidth + dX, y=Y2 + 5 * dY)
+entry_I = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_I.place(x=X1 + 5 * StandardWidth + dX, y=Y2 + 5 * dY)
+entry_I.insert(0, "7.8510e-9")
 
 add_line_button = ctk.CTkButton(master=frame, text="Добавить", command=add_line_function, fg_color="#418433",
                                 hover_color="#1F4618")
@@ -201,16 +231,19 @@ ctk.CTkLabel(master=frame, text="F_x", fg_color="#0066CC", width=StandardWidth, 
     x=X1, y=Y2 + 8 * dY)
 entry_F_x = ctk.CTkEntry(master=frame, width=StandardWidth)
 entry_F_x.place(x=X1 + StandardWidth, y=Y2 + 8 * dY)
+entry_F_x.insert(0, 0)
 
 ctk.CTkLabel(master=frame, text="F_y", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
     x=X1 + 2 * StandardWidth + int(dX / 2), y=Y2 + 8 * dY)
 entry_F_y = ctk.CTkEntry(master=frame, width=StandardWidth)
 entry_F_y.place(x=X1 + 3 * StandardWidth + int(dX / 2), y=Y2 + 8 * dY)
+entry_F_y.insert(0, 0)
 
 ctk.CTkLabel(master=frame, text="M", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
     x=X1 + 4 * StandardWidth + dX, y=Y2 + 8 * dY)
 entry_M = ctk.CTkEntry(master=frame, width=StandardWidth)
 entry_M.place(x=X1 + 5 * StandardWidth + dX, y=Y2 + 8 * dY)
+entry_M.insert(0, 0)
 
 add_force_button = ctk.CTkButton(master=frame, text="Добавить", command=add_force_function, fg_color="#418433",
                                  hover_color="#1F4618")
