@@ -265,8 +265,8 @@ add_force_button = ctk.CTkButton(master=frame, text="Добавить", command=
 add_force_button.place(x=5 * StandardWidth - 5, y=Y2 + 7 * dY)
 
 solve_button = ctk.CTkButton(master=frame, text="Решить", width=4 * StandardWidth + dX, command=solve_function,
-                             fg_color="#5a2d80",
-                             hover_color="#1F4618")
+                             fg_color="#2310e6",
+                             hover_color="#281d96")
 solve_button.place(x=X1 + StandardWidth, y=Y2 + 10 * dY)
 
 app.mainloop()
