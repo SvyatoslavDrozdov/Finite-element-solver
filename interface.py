@@ -3,7 +3,6 @@ import customtkinter as ctk
 from PIL import ImageTk, Image
 from sub_plot import plot_points_function
 
-# from sub_plot import plot_points_function
 ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("blue")
 
@@ -23,11 +22,12 @@ frame.pack(pady=20, padx=60, fill="both", expand=True)
 
 empty_img = ctk.CTkImage(Image.open("empty_foo.png"), size=(600, 600))
 empty_label = ctk.CTkLabel(master=frame, image=empty_img, text="")
-empty_label.place(relx=0.7, rely=0.5, anchor=ctk.CENTER)
+empty_label.place(relx=0.7, rely=0.45, anchor=ctk.CENTER)
 
-button = ctk.CTkButton(master=frame, text="Обновить график", command=button_function)
+# Добавлю в следующих версиях программы
+# button = ctk.CTkButton(master=frame, text="Обновить график", command=button_function)
 # button.place(relx=0.1, rely=0.8, anchor=ctk.CENTER)
-button.place(x=3 * 80 - 5, y=60 + 10 * 50)
+# button.place(x=3 * 80 - 5, y=60 + 10 * 50)
 # My settings: --------------------------------------------------------------------------------------------------------
 X1 = 30
 X2 = 250
@@ -232,7 +232,7 @@ add_line_button = ctk.CTkButton(master=frame, text="Добавить", command=a
                                 hover_color="#1F4618")
 add_line_button.place(x=5 * StandardWidth - 5, y=Y2 + 4 * dY)
 
-# Задание узловых сил: -----------------------------------------------------------------------------------------------------
+# Задание узловых сил: -------------------------------------------------------------------------------------------------
 ctk.CTkLabel(master=frame, text="Задание узловых сил", text_color='white', fg_color="#7F55F2",
              width=6 * StandardWidth + dX,
              corner_radius=10).place(x=X1, y=Y1 + 7 * dY)
@@ -264,17 +264,9 @@ add_force_button = ctk.CTkButton(master=frame, text="Добавить", command=
                                  hover_color="#1F4618")
 add_force_button.place(x=5 * StandardWidth - 5, y=Y2 + 7 * dY)
 
-# SHOW SWITCH  ---------------------------------------------------------------------------------------------------------
-
-# ctk.CTkLabel(master=frame, text="Показывать линии", fg_color="#0066CC", width=2 * StandardWidth,
-#              corner_radius=10).place(
-#     x=X2 - dX, y=8 * Y2 + dY)
-# show_lines_switch = ctk.CTkSwitch(master=frame, text="")
-# show_lines_switch.place(x=X2 + StandardWidth2 + dX, y=8 * Y2 + dY)
-# show_lines_switch.select()
-
-add_line_button = ctk.CTkButton(master=frame, text="Решить", command=solve_function, fg_color="#418433",
-                                hover_color="#1F4618")
-add_line_button.place(x=5 * StandardWidth - 5, y=Y2 + 10 * dY)
+solve_button = ctk.CTkButton(master=frame, text="Решить", width=4 * StandardWidth + dX, command=solve_function,
+                             fg_color="#5a2d80",
+                             hover_color="#1F4618")
+solve_button.place(x=X1 + StandardWidth, y=Y2 + 10 * dY)
 
 app.mainloop()

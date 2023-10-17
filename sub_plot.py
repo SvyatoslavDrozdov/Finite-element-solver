@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 from data import nodes_function, create_force, force_function
-from first_generalization import solution
+from core import solution
 
 point_num = []
 nodes = np.array([])
@@ -92,6 +92,7 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
     if line_points:
         [X_nodes, Y_nodes] = nodes_function(X, Y, line_points, element_number)
         if solve:
+            print("Im here")
             node_line_correspondence = []
             all_node_line_correspondence = []
             all_nodes_on_element_array = []
@@ -165,29 +166,36 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
         for line in line_points:
             n_1 = line[0]
             n_2 = line[1]
+            # print(node_line_correspondence)
             for i in range(0, len(node_line_correspondence)):
                 if node_line_correspondence[i][0] == n_1:
                     node_1 = node_line_correspondence[i][1]
                 if node_line_correspondence[i][0] == n_2:
                     node_2 = node_line_correspondence[i][1]
             E_N = element_number[e]
+            # print(f"1 = {node_line_correspondence}")
+
             if node_1 in all_node_line_correspondence[e] and node_2 in all_node_line_correspondence[e]:
                 for j in range(0, E_N):
                     elements.append([node_1 + j, node_1 + j + 1])
                     lines_elements.append([e + 1, [node_1 + j, node_1 + j + 1]])
-            elif node_1 in all_node_line_correspondence[e]:
-                for j in range(0, E_N - 1):
-                    elements.append([node_1 + j, node_1 + j + 1])
-                    lines_elements.append([e + 1, [node_1 + j, node_1 + j + 1]])
-                elements.append([node_1, all_nodes_on_element_array[e][-1]])
-                lines_elements.append([e + 1, [node_1, all_nodes_on_element_array[e][-1]]])
-            elif node_2 in all_node_line_correspondence[e]:
-                elements.append([node_1, all_nodes_on_element_array[e][0]])
-                lines_elements.append([e + 1, [node_1, all_nodes_on_element_array[e][0]]])
-                for j in range(0, len(all_nodes_on_element_array[e]) - 1):
-                    elements.append([all_nodes_on_element_array[e][j], all_nodes_on_element_array[e][j + 1]])
-                    lines_elements.append(
-                        [e + 1, [all_nodes_on_element_array[e][j], all_nodes_on_element_array[e][j + 1]]])
+
+            # elif node_1 in all_node_line_correspondence[e]:
+            #     for j in range(0, E_N - 1):
+            #         elements.append([node_1 + j, node_1 + j + 1])
+            #         lines_elements.append([e + 1, [node_1 + j, node_1 + j + 1]])
+            #     elements.append([node_1, all_nodes_on_element_array[e][-1]])
+            #     lines_elements.append([e + 1, [node_1, all_nodes_on_element_array[e][-1]]])
+
+            # elif node_2 in all_node_line_correspondence[e]:
+            #
+            #     elements.append([node_1, all_nodes_on_element_array[e][0]])
+            #     lines_elements.append([e + 1, [node_1, all_nodes_on_element_array[e][0]]])
+            #     for j in range(0, len(all_nodes_on_element_array[e]) - 1):
+            #         elements.append([all_nodes_on_element_array[e][j], all_nodes_on_element_array[e][j + 1]])
+            #         lines_elements.append(
+            #             [e + 1, [all_nodes_on_element_array[e][j], all_nodes_on_element_array[e][j + 1]]])
+
             else:
                 try:
                     elements.append([node_1, all_nodes_on_element_array[e][0]])
@@ -201,14 +209,29 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
                 except:
                     elements.append([node_1, node_2])
                     lines_elements.append([e + 1, [node_1, node_2]])
-            e += 1
-        element_properties = []
 
+            e += 1
+
+        counter = 0
+        for el in elements:
+            if el[0] == el[1]:
+                elements = elements[:counter] + elements[counter + 1:]
+                counter -= 1
+            counter += 1
+
+        counter = 0
+        for le in lines_elements:
+            if le[1][0] == le[1][1]:
+                lines_elements = lines_elements[:counter] + lines_elements[counter + 1:]
+                counter -= 1
+            counter += 1
+
+        element_properties = []
+        print(elements)
+        print(lines_elements)
         for i in range(0, len(elements)):
             element_properties.append([E_vector[i], A_vector[i], I_vector[i]])
 
-        # print(f"node_line_correspondence = {node_line_correspondence}")
-        # print(f"nodes = {nodes}")
         updated_boundary_condition_matrix = []
         for i in range(0, len(nodes)):
             updated_boundary_condition_matrix.append(["free", ""])
@@ -216,15 +239,9 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
         for points in range(0, len(boundary_condition_matrix)):
             for p in range(0, len(boundary_condition_matrix)):
                 if node_line_correspondence[p][0] == points + 1:
-                    # print()
                     updated_boundary_condition_matrix[node_line_correspondence[p][1] - 1] = boundary_condition_matrix[
                         points]
 
-        # print(f"lines_elements = {lines_elements}")
-        # print(f"line_points = {line_points}")
-
-        # force_density = force_function(func, s)
-        # normal_force_functions
         def v(point_coordinate, lgth):
             N = np.array([
                 1 - 3 * point_coordinate ** 2 / lgth ** 2 + 2 * point_coordinate ** 3 / lgth ** 3,
@@ -251,7 +268,7 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
                 integral += y_loc * dx
             return integral
 
-        def force_creator(force_func, all_nodes, nod_1, nod_2, len_global_element):
+        def force_creator(force_func, len_global_element):
             x_1_fc = nodes[node_1 - 1][0]
             y_1_fc = nodes[node_1 - 1][1]
             x_2_fc = nodes[node_2 - 1][0]
@@ -267,7 +284,7 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
             # counter += 1
             return [node_1_force, node_2_force]
 
-        def force_creator_tan(force_func, all_nodes, nod_1, nod_2, len_global_element):
+        def force_creator_tan(force_func, len_global_element):
             x_1_fc = nodes[node_1 - 1][0]
             y_1_fc = nodes[node_1 - 1][1]
             x_2_fc = nodes[node_2 - 1][0]
@@ -296,8 +313,8 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
                     x_2_for_creator = nodes[node_2 - 1][0]
                     y_2_for_creator = nodes[node_2 - 1][1]
 
-                    nod_fo_tan = force_creator_tan(force_dens_tan, nodes, node_1, node_2, length_global_element)
-                    nod_fo_normal = force_creator(force_dens, nodes, node_1, node_2, length_global_element)
+                    nod_fo_tan = force_creator_tan(force_dens_tan, length_global_element)
+                    nod_fo_normal = force_creator(force_dens, length_global_element)
                     nod_fo = [0, 0]
                     nod_fo[0] = nod_fo_tan[0] + nod_fo_normal[0]
                     nod_fo[1] = nod_fo_tan[1] + nod_fo_normal[1]
@@ -306,14 +323,11 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
                             y_1_for_creator - y_2_for_creator) ** 2) ** 0.5
                     force_nodes.append([node_1, nod_fo[0], [node_1, node_2]])
                     force_nodes.append([node_2, nod_fo[1], [node_1, node_2]])
-        print(force_nodes)
 
         node_forces = []
         for n in range(1, len(nodes) + 1):
             node_forces.append([n])
 
-        # print(f"print(elements) = {elements}")
-        print(f"force_nodes = {force_nodes}")
         for n in range(1, len(nodes) + 1):
             sum_Fx = 0
             sum_Fy = 0
@@ -324,10 +338,8 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
                     sum_Fy += force_nodes[i][1][1]
                     sum_M += force_nodes[i][1][2]
             node_forces[n - 1].append([sum_Fx, sum_Fy, sum_M])
-        # print(f"force_nodes = {force_nodes}")
-        # print(f"node_forces = {node_forces}")
-        force = create_force(node_line_correspondence, nodes, line_points, boundary_condition_matrix, Forces,
+
+        force = create_force(node_line_correspondence, nodes, boundary_condition_matrix, Forces,
                              node_forces)
-        print(f"force = {force}")
 
         solution(nodes, elements, updated_boundary_condition_matrix, force, element_properties)

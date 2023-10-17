@@ -15,7 +15,7 @@ def nodes_function(X, Y, line_points, element_number):
     return [X_node, Y_node]
 
 
-def create_force(node_line_correspondence, nodes, line_points, boundary_condition_matrix, Forces, node_forces):
+def create_force(node_line_correspondence, nodes, boundary_condition_matrix, Forces, node_forces):
     f = np.zeros(3 * len(nodes))
 
     f = f.reshape(len(nodes), 3)
@@ -88,6 +88,8 @@ def force_function(func):
     func = func.replace("s^", "s**")
     func = func.replace("sin(", "np.sin(")
     func = func.replace("cos(", "np.cos(")
+    func = func.replace("tan(", "np.tan(")
+    func = func.replace("log(", "np.log(")
 
     def y(s):
         f = eval(func)

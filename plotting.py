@@ -1,5 +1,5 @@
 import matplotlib.pyplot as plt
-from first_generalization import *
+from core import *
 
 plt.figure(figsize=(8, 8))
 

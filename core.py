@@ -1,5 +1,4 @@
 import numpy as np
-# from data import nodes, elements, nodes_restrictions, force_vector, element_properties
 import matplotlib.pyplot as plt
 
 
@@ -48,8 +47,6 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
     global_element_stiffness_matrix = []
     e = 0
     for element in elements:
-        # print(f"e = {e}")
-        # print(f"element_properties[e] = {element_properties[e]}")
         local_stiffness_matrix = local_stiffness_matrix_function(element_properties[e], e)
         stiffness = np.dot(np.dot(T(element).transpose(), local_stiffness_matrix), T(element))
         global_element_stiffness_matrix.append(stiffness)
@@ -256,26 +253,15 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
         else:
             plt.plot(initial_x_coordinate, initial_y_coordinate, 'k--')
             plt.plot(deformed_x_coordinate, deformed_y_coordinate, color="blue")
-        if e == elements_number - 1:
-            print(deformed_x_coordinate - initial_x_coordinate)
+        # if e == elements_number - 1:
+            # print(deformed_x_coordinate - initial_x_coordinate)
     plt.legend()
-    # plt.title("Расчет балочной конструкции")
 
     Length_max = 0
-    # Y_min = 0
-    # Y_max = 0
     for e in range(0, elements_number):
         [first_node, second_node] = elements[e]
         [x_i, y_i] = nodes[first_node - 1]
-        # if Y_min > y_i:
-        #     Y_min = y_i
-        # if Y_max < y_i:
-        #     Y_max = y_i
         [x_j, y_j] = nodes[second_node - 1]
-        # if Y_min > y_j:
-        #     Y_min = y_j
-        # if Y_max < y_j:
-        #     Y_max = y_j
         Length = ((x_i - x_j) ** 2 + (y_i - y_j) ** 2) ** 0.5
         if Length_max < Length:
             Length_max = Length
@@ -317,71 +303,7 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
             plt.plot(base_x, base_y, color="red")
 
         node_num += 1
-    # plt.ylim(Y_min - 0.3 * abs(Y_min), Y_max + 0.3*abs(Y_max))
-
-    E = 2.1e11
-    I = 7.8510e-9
-
-    # l = 2
-    # k = np.pi
-    # X = np.linspace(0, l, 10000)
-    # C = 1 / k ** 3 * (k * l - 2 * np.sin(k * l) + k * l * np.cos(k * l))
-    # D = 1 / (2 * k ** 4) * (k * l * (k * l + 2 * np.sin(k * l)) + 6 * np.cos(k * l)) - C * l
-    # x = X
-    # Y = C * X + D - 1 / (2 * k ** 4) * (k * x * (k * x + 2 * np.sin(k * x)) + 6 * np.cos(k * x))
-    # Y = 500 * Y / (E * I)
-
-    # l = 2
-    # q = 2000
-    # X = np.linspace(0, l, 1000)
-    # D = q / 6 * l ** 4 - q / 24 * l ** 4
-    # Y = q / 24 * X ** 4 - q / 6 * l ** 3 * X + D
-    # Y = Y / (E * I)
-
-    # l = 2
-    # k = 500
-    # X = np.linspace(0, l, 1000)
-    #
-    # C = -k * l ** 4 / 12
-    # D = -k * l ** 5 / 60 - C * l
-    # Y = k * X ** 5 / 60 + C * X + D
-    # Y = Y / (E * I)
-
-    # l = 2
-    # X = np.linspace(0, l, 1000)
-    # F_0 = 100
-    # M_0 = 100
-    # C = -F_0 * l ** 2 / 2 - M_0 * l
-    # D = -F_0 * l ** 3 / 6 - M_0 * l ** 2 / 2 - C * l
-    # Y = F_0 * X ** 3 / 6 + M_0 * X ** 2 / 2 + C * X + D
-    # Y = Y / (E * I)
-
-    # нормально работающий пример с силйо моментом, и q = const
-    # l = 2
-    #
-    # q = 2000
-    # F_0 = 100
-    # M_0 = 200
-    #
-    # X = np.linspace(0, l, 1000)
-    # C = - M_0 * l - F_0 * l ** 2 / 2 - q * l ** 3 / 6
-    # D = - M_0 * l ** 2 / 2 - F_0 * l ** 3 / 6 - q * l ** 4 / 24 - C * l
-    # Y = M_0 * X ** 2 / 2 + F_0 * X ** 3 / 6 + q * X ** 4 / 24 + C * X + D
-    # Y = Y / (E * I)
-    # plt.plot(l - X, Y, color="red")
-
-    # l = 2
-    # k = 500
-    # X = np.linspace(0, l, 1000)
-    # C = -k * l ** 4 / 24
-    # D = -k * l ** 5 / 120 - C * l
-    # Y = k * X ** 5 / 120 + C * X + D
-    # Y = Y / (E * I)
-    #
-    # plt.plot(l - X, Y, color="red")
 
     plt.axis('equal')
     plt.grid()
     plt.savefig('foo.png')
-
-    # plt.show()
