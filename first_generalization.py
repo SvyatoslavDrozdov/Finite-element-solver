@@ -256,6 +256,8 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
         else:
             plt.plot(initial_x_coordinate, initial_y_coordinate, 'k--')
             plt.plot(deformed_x_coordinate, deformed_y_coordinate, color="blue")
+        if e == elements_number - 1:
+            print(deformed_x_coordinate - initial_x_coordinate)
     plt.legend()
     # plt.title("Расчет балочной конструкции")
 
@@ -368,15 +370,15 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
     # Y = Y / (E * I)
     # plt.plot(l - X, Y, color="red")
 
-    l = 2
-    k = 500
-    X = np.linspace(0, l, 1000)
-    C = -k * l ** 4 / 24
-    D = -k * l ** 5 / 120 - C * l
-    Y = k * X ** 5 / 120 + C * X + D
-    Y = Y / (E * I)
-
-    plt.plot(l - X, Y, color="red")
+    # l = 2
+    # k = 500
+    # X = np.linspace(0, l, 1000)
+    # C = -k * l ** 4 / 24
+    # D = -k * l ** 5 / 120 - C * l
+    # Y = k * X ** 5 / 120 + C * X + D
+    # Y = Y / (E * I)
+    #
+    # plt.plot(l - X, Y, color="red")
 
     plt.axis('equal')
     plt.grid()

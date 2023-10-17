@@ -14,7 +14,7 @@ I = np.pi * R ** 4 / 4
 
 
 def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, solve, Forces, E_vector, A_vector,
-                         I_vector, normal_force_functions):
+                         I_vector, normal_force_functions, tangent_force_functions):
     boundary_condition_matrix = []
     global point_num
     global nodes
@@ -234,17 +234,24 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
             ])
             return N
 
-        def Integral(f_1, f_2, L, len_global_element):
+        def u(point_coordinate, lgth):
+            N = np.array([
+                1 - point_coordinate / lgth,
+                point_coordinate / lgth
+            ])
+            return N
+
+        def Integral(form_func, force_func, L, len_global_element):
             num_for_integral = 2000
             X_integral = np.linspace(0, L, num_for_integral)
             dx = L / num_for_integral
             integral = 0
             for x_loc in X_integral:
-                y_loc = f_1(x_loc, L) * f_2(len_global_element + x_loc)
+                y_loc = form_func(x_loc, L) * force_func(len_global_element + x_loc)
                 integral += y_loc * dx
             return integral
 
-        def force_creator(force_func, all_nodes, nod_1, nod_2, len_global_element, counter):
+        def force_creator(force_func, all_nodes, nod_1, nod_2, len_global_element):
             x_1_fc = nodes[node_1 - 1][0]
             y_1_fc = nodes[node_1 - 1][1]
             x_2_fc = nodes[node_2 - 1][0]
@@ -257,7 +264,22 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
             node_1_force = [-F_local[0] * sin_A, F_local[0] * cos_A, F_local[1]]
             node_2_force = [-F_local[2] * sin_A, F_local[2] * cos_A, F_local[3]]
 
-            counter += 1
+            # counter += 1
+            return [node_1_force, node_2_force]
+
+        def force_creator_tan(force_func, all_nodes, nod_1, nod_2, len_global_element):
+            x_1_fc = nodes[node_1 - 1][0]
+            y_1_fc = nodes[node_1 - 1][1]
+            x_2_fc = nodes[node_2 - 1][0]
+            y_2_fc = nodes[node_2 - 1][1]
+            length = ((x_1_fc - x_2_fc) ** 2 + (y_1_fc - y_2_fc) ** 2) ** 0.5
+            F_local = Integral(u, force_func, length, len_global_element)
+
+            sin_A = (y_2_fc - y_1_fc) / length
+            cos_A = (x_2_fc - x_1_fc) / length
+            node_1_force = np.array([F_local[0] * cos_A, F_local[0] * sin_A, 0])
+            node_2_force = np.array([F_local[1] * cos_A, F_local[1] * sin_A, 0])
+
             return [node_1_force, node_2_force]
 
         force_nodes = []
@@ -265,6 +287,7 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
         counter = 0
         for l in range(0, len(line_points)):
             force_dens = force_function(normal_force_functions[l])
+            force_dens_tan = force_function(tangent_force_functions[l])
             for i in range(0, len(lines_elements)):
                 if lines_elements[i][0] == l + 1:
                     [node_1, node_2] = lines_elements[i][1]
@@ -273,8 +296,12 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
                     x_2_for_creator = nodes[node_2 - 1][0]
                     y_2_for_creator = nodes[node_2 - 1][1]
 
-                    nod_fo = force_creator(force_dens, nodes, node_1, node_2, length_global_element, counter)
-                    counter += 1
+                    nod_fo_tan = force_creator_tan(force_dens_tan, nodes, node_1, node_2, length_global_element)
+                    nod_fo_normal = force_creator(force_dens, nodes, node_1, node_2, length_global_element)
+                    nod_fo = [0, 0]
+                    nod_fo[0] = nod_fo_tan[0] + nod_fo_normal[0]
+                    nod_fo[1] = nod_fo_tan[1] + nod_fo_normal[1]
+
                     length_global_element += ((x_1_for_creator - x_2_for_creator) ** 2 + (
                             y_1_for_creator - y_2_for_creator) ** 2) ** 0.5
                     force_nodes.append([node_1, nod_fo[0], [node_1, node_2]])

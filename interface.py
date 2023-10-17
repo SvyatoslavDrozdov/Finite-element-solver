@@ -89,9 +89,9 @@ def add_point_function():
         BC_parameter.append(boundary_condition_parameter)
         if line_points:
             plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0, Forces, E_vector, A_vector,
-                                 I_vector, normal_force_functions)
+                                 I_vector, normal_force_functions, tangent_force_functions)
         else:
-            plot_points_function(X, Y, BC, BC_parameter, [], [], 0, Forces, [], [], [], [])
+            plot_points_function(X, Y, BC, BC_parameter, [], [], 0, Forces, [], [], [], [], [])
         button_function()
 
 
@@ -101,6 +101,7 @@ E_vector = []
 A_vector = []
 I_vector = []
 normal_force_functions = []
+tangent_force_functions = []
 
 
 def add_line_function():
@@ -110,8 +111,9 @@ def add_line_function():
     global A_vector
     global I_vector
     f_n = entry_f_n.get()
+    f_t = entry_f_t.get()
     normal_force_functions.append(f_n)
-
+    tangent_force_functions.append(f_t)
 
     elem_number = int(entry_elem_number.get())
     element_number.append(elem_number)
@@ -129,13 +131,13 @@ def add_line_function():
     line_points.append([num_of_point_1, num_of_point_2])
 
     plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0, Forces, E_vector, A_vector, I_vector,
-                         normal_force_functions)
+                         normal_force_functions, tangent_force_functions)
     button_function()
 
 
 def solve_function():
     plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 1, Forces, E_vector, A_vector, I_vector,
-                         normal_force_functions)
+                         normal_force_functions, tangent_force_functions)
     button_function()
 
 
@@ -206,6 +208,7 @@ ctk.CTkLabel(master=frame, text="f_t(s) =", fg_color="#0066CC", width=StandardWi
     x=X1 + 2 * StandardWidth + int(dX / 2), y=Y2 + 4 * dY)
 entry_f_t = ctk.CTkEntry(master=frame, width=StandardWidth)
 entry_f_t.place(x=X1 + 3 * StandardWidth + int(dX / 2), y=Y2 + 4 * dY)
+entry_f_t.insert(0, 0)
 
 ctk.CTkLabel(master=frame, text="E =", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
     x=X1, y=Y2 + 5 * dY)
