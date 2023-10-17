@@ -89,9 +89,9 @@ def add_point_function():
         BC_parameter.append(boundary_condition_parameter)
         if line_points:
             plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0, Forces, E_vector, A_vector,
-                                 I_vector)
+                                 I_vector, normal_force_functions)
         else:
-            plot_points_function(X, Y, BC, BC_parameter, [], [], 0, Forces, [], [], [])
+            plot_points_function(X, Y, BC, BC_parameter, [], [], 0, Forces, [], [], [], [])
         button_function()
 
 
@@ -100,6 +100,7 @@ element_number = []
 E_vector = []
 A_vector = []
 I_vector = []
+normal_force_functions = []
 
 
 def add_line_function():
@@ -108,36 +109,46 @@ def add_line_function():
     global E_vector
     global A_vector
     global I_vector
+    f_n = entry_f_n.get()
+    normal_force_functions.append(f_n)
+
+
+    elem_number = int(entry_elem_number.get())
+    element_number.append(elem_number)
 
     E = float(entry_E.get())
     A = float(entry_A.get())
     I = float(entry_I.get())
-    E_vector.append(E)
-    A_vector.append(A)
-    I_vector.append(I)
+    for i in range(0, elem_number):
+        E_vector.append(E)
+        A_vector.append(A)
+        I_vector.append(I)
 
     num_of_point_1 = int(entry_num_of_point_1.get())
     num_of_point_2 = int(entry_num_of_point_2.get())
     line_points.append([num_of_point_1, num_of_point_2])
 
-    elem_number = int(entry_elem_number.get())
-    element_number.append(elem_number)
-
-    plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0, Forces, E_vector, A_vector, I_vector)
+    plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 0, Forces, E_vector, A_vector, I_vector,
+                         normal_force_functions)
     button_function()
 
 
 def solve_function():
-    plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 1, Forces, E_vector, A_vector, I_vector)
+    plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, 1, Forces, E_vector, A_vector, I_vector,
+                         normal_force_functions)
     button_function()
 
 
 def add_force_function():
     global Forces
-    F_x = int(entry_F_x.get())
-    F_y = int(entry_F_y.get())
-    M = int(entry_M.get())
+    F_x = float(entry_F_x.get())
+    F_y = float(entry_F_y.get())
+    M = float(entry_M.get())
     node_force_number = int(entry_num_of_nodes.get())
+    for i in range(0, len(Forces)):
+        if Forces[i][0] == node_force_number:
+            Forces = Forces[:i] + Forces[i + 1:]
+
     Forces.append([node_force_number, F_x, F_y, M])
 
 
@@ -189,11 +200,12 @@ ctk.CTkLabel(master=frame, text="f_n(s) =", fg_color="#0066CC", width=StandardWi
     x=X1, y=Y2 + 4 * dY)
 entry_f_n = ctk.CTkEntry(master=frame, width=StandardWidth)
 entry_f_n.place(x=X1 + StandardWidth, y=Y2 + 4 * dY)
+entry_f_n.insert(0, 0)
 
 ctk.CTkLabel(master=frame, text="f_t(s) =", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
     x=X1 + 2 * StandardWidth + int(dX / 2), y=Y2 + 4 * dY)
-entry_f_n = ctk.CTkEntry(master=frame, width=StandardWidth)
-entry_f_n.place(x=X1 + 3 * StandardWidth + int(dX / 2), y=Y2 + 4 * dY)
+entry_f_t = ctk.CTkEntry(master=frame, width=StandardWidth)
+entry_f_t.place(x=X1 + 3 * StandardWidth + int(dX / 2), y=Y2 + 4 * dY)
 
 ctk.CTkLabel(master=frame, text="E =", fg_color="#0066CC", width=StandardWidth, corner_radius=10).place(
     x=X1, y=Y2 + 5 * dY)

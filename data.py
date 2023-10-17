@@ -15,41 +15,28 @@ def nodes_function(X, Y, line_points, element_number):
     return [X_node, Y_node]
 
 
-def create_force_and_boundary(node_line_correspondence, nodes, line_points, boundary_condition_matrix, Forces):
+def create_force(node_line_correspondence, nodes, line_points, boundary_condition_matrix, Forces, node_forces):
     f = np.zeros(3 * len(nodes))
-    # all_boundary = []
-    # for n in range(0, len(nodes)):
-    #     all_boundary.append(["free", ""])
-    # for nl in range(0, len(node_line_correspondence)):
-    #     all_boundary[node_line_correspondence[nl][1] - 1] = boundary_condition_matrix[nl]
-    # print(boundary)
 
     f = f.reshape(len(nodes), 3)
-    # print(f)
     for node_num in range(0, len(f)):
         for n in range(0, len(Forces)):
             if node_num + 1 == Forces[n][0]:
                 f[node_num][0] = Forces[n][1]
                 f[node_num][1] = Forces[n][2]
                 f[node_num][2] = Forces[n][3]
-
-    # print(f)
-    # f.reshape(len(nodes), 3)
-    # print(f)
-
+        f[node_num][0] += node_forces[node_num][1][0]
+        f[node_num][1] += node_forces[node_num][1][1]
+        f[node_num][2] += node_forces[node_num][1][2]
     point = 0
     for boundary in boundary_condition_matrix:
         point += 1
-        # if point >= 2:
-        # print(f)
 
         if boundary[0] == "hard seal":
             for l in range(0, len(node_line_correspondence)):
                 if node_line_correspondence[l][0] == point:
                     node_number = node_line_correspondence[l][1]
-            # print(f"point = {point}")
-            # print(f"deleted = {deleted}")
-            add_f = f[node_number :]
+            add_f = f[node_number:]
             f = np.append(f[:node_number - 1], ["*", "*", "*"])
 
             f = np.append(f, add_f)
@@ -61,19 +48,18 @@ def create_force_and_boundary(node_line_correspondence, nodes, line_points, boun
                 if node_line_correspondence[l][0] == point:
                     node_number = node_line_correspondence[l][1]
             add_f = f[node_number:]
-            f = np.append(f[:node_number - 1], ["*", "*", f[node_number - 1 - deleted][2]])
+            f = np.append(f[:node_number - 1], ["*", "*", f[node_number - 1][2]])
 
             f = np.append(f, add_f)
 
             f = f.reshape(int(len(f) / 3), 3)
-        # print(boundary[0])
         if boundary[0] == "movable hinge OX":
             for l in range(0, len(node_line_correspondence)):
                 if node_line_correspondence[l][0] == point:
                     node_number = node_line_correspondence[l][1]
             add_f = f[node_number:]
             f = np.append(f[:node_number - 1],
-                          [f[node_number - 1 ][0], "*", f[node_number - 1][2]])
+                          [f[node_number - 1][0], "*", f[node_number - 1][2]])
             f = np.append(f, add_f)
             f = f.reshape(int(len(f) / 3), 3)
         if boundary[0] == "movable hinge OY":
@@ -95,7 +81,16 @@ def create_force_and_boundary(node_line_correspondence, nodes, line_points, boun
             pass
     for i in range(0, len(f)):
         f[i] = float(f[i])
-    # print(f)
-    # print(f)
-    # print(f.reshape(3 * len(f)))
     return f
+
+
+def force_function(func):
+    func = func.replace("s^", "s**")
+    func = func.replace("sin(", "np.sin(")
+    func = func.replace("cos(", "np.cos(")
+
+    def y(s):
+        f = eval(func)
+        return f
+
+    return y

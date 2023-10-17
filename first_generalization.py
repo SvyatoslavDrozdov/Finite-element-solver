@@ -316,6 +316,68 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
 
         node_num += 1
     # plt.ylim(Y_min - 0.3 * abs(Y_min), Y_max + 0.3*abs(Y_max))
+
+    E = 2.1e11
+    I = 7.8510e-9
+
+    # l = 2
+    # k = np.pi
+    # X = np.linspace(0, l, 10000)
+    # C = 1 / k ** 3 * (k * l - 2 * np.sin(k * l) + k * l * np.cos(k * l))
+    # D = 1 / (2 * k ** 4) * (k * l * (k * l + 2 * np.sin(k * l)) + 6 * np.cos(k * l)) - C * l
+    # x = X
+    # Y = C * X + D - 1 / (2 * k ** 4) * (k * x * (k * x + 2 * np.sin(k * x)) + 6 * np.cos(k * x))
+    # Y = 500 * Y / (E * I)
+
+    # l = 2
+    # q = 2000
+    # X = np.linspace(0, l, 1000)
+    # D = q / 6 * l ** 4 - q / 24 * l ** 4
+    # Y = q / 24 * X ** 4 - q / 6 * l ** 3 * X + D
+    # Y = Y / (E * I)
+
+    # l = 2
+    # k = 500
+    # X = np.linspace(0, l, 1000)
+    #
+    # C = -k * l ** 4 / 12
+    # D = -k * l ** 5 / 60 - C * l
+    # Y = k * X ** 5 / 60 + C * X + D
+    # Y = Y / (E * I)
+
+    # l = 2
+    # X = np.linspace(0, l, 1000)
+    # F_0 = 100
+    # M_0 = 100
+    # C = -F_0 * l ** 2 / 2 - M_0 * l
+    # D = -F_0 * l ** 3 / 6 - M_0 * l ** 2 / 2 - C * l
+    # Y = F_0 * X ** 3 / 6 + M_0 * X ** 2 / 2 + C * X + D
+    # Y = Y / (E * I)
+
+    # нормально работающий пример с силйо моментом, и q = const
+    # l = 2
+    #
+    # q = 2000
+    # F_0 = 100
+    # M_0 = 200
+    #
+    # X = np.linspace(0, l, 1000)
+    # C = - M_0 * l - F_0 * l ** 2 / 2 - q * l ** 3 / 6
+    # D = - M_0 * l ** 2 / 2 - F_0 * l ** 3 / 6 - q * l ** 4 / 24 - C * l
+    # Y = M_0 * X ** 2 / 2 + F_0 * X ** 3 / 6 + q * X ** 4 / 24 + C * X + D
+    # Y = Y / (E * I)
+    # plt.plot(l - X, Y, color="red")
+
+    l = 2
+    k = 500
+    X = np.linspace(0, l, 1000)
+    C = -k * l ** 4 / 24
+    D = -k * l ** 5 / 120 - C * l
+    Y = k * X ** 5 / 120 + C * X + D
+    Y = Y / (E * I)
+
+    plt.plot(l - X, Y, color="red")
+
     plt.axis('equal')
     plt.grid()
     plt.savefig('foo.png')
