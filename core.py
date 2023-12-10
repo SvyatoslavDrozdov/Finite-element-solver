@@ -1,5 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from write_data import write_data, delete_data
 
 
 def solution(nodes, elements, nodes_restrictions, force_vector, element_properties):
@@ -181,6 +182,7 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
 
     displacement = displacement.reshape((nodes_number, 3))
 
+    delete_data()
     e = 0
     local_displacement = np.array([])
     for element in elements:
@@ -189,6 +191,9 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
         local_displacement = np.append(local_displacement, np.dot(T(element), element_displacement))
         e += 1
     local_displacement = local_displacement.reshape(elements_number, 6)
+
+    for e in range(len(elements)):
+        write_data(e, local_displacement)
 
     def v(point_coordinate, element_nodes_displacement, lgth):
         N = np.array([
@@ -254,7 +259,8 @@ def solution(nodes, elements, nodes_restrictions, force_vector, element_properti
             plt.plot(initial_x_coordinate, initial_y_coordinate, 'k--')
             plt.plot(deformed_x_coordinate, deformed_y_coordinate, color="blue")
         # if e == elements_number - 1:
-            # print(deformed_x_coordinate - initial_x_coordinate)
+        # print(deformed_x_coordinate - initial_x_coordinate)
+
     plt.legend()
 
     Length_max = 0

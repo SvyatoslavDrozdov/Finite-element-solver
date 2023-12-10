@@ -92,7 +92,7 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
     if line_points:
         [X_nodes, Y_nodes] = nodes_function(X, Y, line_points, element_number)
         if solve:
-            print("Im here")
+            # print("Im here")
             node_line_correspondence = []
             all_node_line_correspondence = []
             all_nodes_on_element_array = []
@@ -227,8 +227,8 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
             counter += 1
 
         element_properties = []
-        print(elements)
-        print(lines_elements)
+        # print(elements)
+        # print(lines_elements)
         for i in range(0, len(elements)):
             element_properties.append([E_vector[i], A_vector[i], I_vector[i]])
 
@@ -301,7 +301,7 @@ def plot_points_function(X, Y, BC, BC_parameter, line_points, element_number, so
 
         force_nodes = []
         length_global_element = 0
-        counter = 0
+
         for l in range(0, len(line_points)):
             force_dens = force_function(normal_force_functions[l])
             force_dens_tan = force_function(tangent_force_functions[l])
